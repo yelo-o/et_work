@@ -19,7 +19,7 @@ def merge_pdf():
 
     for pdf in pdfs:
         merger.append(pdf_dir+pdf)
-
+    
     merger.write(f"{pdf_dir}합친 파일.pdf")
     merger.close()
     
@@ -46,6 +46,7 @@ def file_select_btn():
     print('refine_ssfiles는',refined_ssfiles)
     print('refine_ssfiles2는',pdfs)
     pdf_dir = re.search(r"(.*\/).*", ssfile).group(1)
+    selected_files.configure(text="{}".format(pdfs))
     # print(pdf_dir)
     # print(ssfile2)
     # pdfs.append(ssfile2)
@@ -61,13 +62,15 @@ frame1.pack(fill=tk.X, expand=True)
 # 프레임 1의 첫번째 열
 first_label = Label(frame1, text = "PDF 파일을 선택해주세요.")
 btn_search = ttk.Button(frame1, text="PDF 파일 불러오기", bootstyle="info", command=file_select_btn)
-selected_file_list = Listbox(frame1)
+# selected_file_list = Listbox(frame1)
+selected_files = ttk.Label(frame1, text="", bootstyle="inverse-dark")
 btn_merge = ttk.Button(frame1, text="합치기", bootstyle="secondary", command=merge_pdf)
 
 # grid 정렬
 first_label.grid(row=1, column=0, sticky="nsew",padx=5, pady=5)
 btn_search.grid(row=3, column=0, sticky="ew", padx=5, pady=5)
-selected_file_list.grid(row=3, column=1, sticky="ns",padx=5, pady=5)
+# selected_file_list.grid(row=3, column=1, sticky="ns",padx=5, pady=5)
+selected_files.grid(row=3, column=1, sticky="ns",padx=5, pady=5)
 btn_merge.grid(row=3, column=2, sticky="ew", padx=5, pady=5 )
 
 
