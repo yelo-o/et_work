@@ -29,8 +29,12 @@ def merge_pdf():
 # 파일 선택
 def file_select_btn():
     global root, pdfs, pdf_dir
-    root.filename = filedialog.askopenfilenames(initialdir = "C:/flyordig/et_work/docs",
-                                                title = "PDF 파일을 골라주세요",
+    # 최초 디렉토리 설정
+    # root.filename = filedialog.askopenfilenames(initialdir = "C:/flyordig/et_work/docs",
+    #                                             title = "PDF 파일을 골라주세요",
+    #                                             filetypes = (("PDF","*.pdf"),("all files","*.*")))
+    # 최초 디렉토리 미설정
+    root.filename = filedialog.askopenfilenames(title = "PDF 파일을 골라주세요",
                                                 filetypes = (("PDF","*.pdf"),("all files","*.*")))
     ssfiles = root.filename
     print(ssfiles)
