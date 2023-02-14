@@ -52,20 +52,24 @@ def pdfs_select_btn():
 
 # PPT 파일 불러오기    
 def ppts_select_btn():
-    global root, ppts, ppt_dir
+    global root, ppts, ppt_dir # root : ttk.Window() <- ttk gui
     root.filename = filedialog.askopenfilenames(title = "PDF 파일을 골라주세요",
-                                                filetypes = (("PPT 파일","*.pptx"),("all files","*.*")))
-    ptfiles = root.filename
-    print(ptfiles)
-    refined_ptfiles = []
+                                                filetypes = (("PPT 파일","*.pptx"),
+                                                ("all files","*.*")))
+    ptfiles = root.filename  # 변수에는 '경로/파일명.pptx' 이런식으로 되어서 저장 됨
+    print("ptfiles는", ptfiles)
+    refined_ptfiles = [] 
     for ptfile in ptfiles:
         refined_ptfiles.append(ptfile)
+    print("refined_ptfiles는", refined_ptfiles)  # 선택한 파일들을 tuple에서 list로 변환하기 위해
     
     for refined_ptfile in refined_ptfiles:
-        ptfile2 = re.search(r'([^\\/]+$)', refined_ptfile).group(1)
+        ptfile2 = re.search(r'([^\\/]+$)', refined_ptfile).group(1)  # ptfile2는 경로를 해제
         ppts.append(ptfile2)
         ppt_dir = re.search(r"(.*\/).*", ptfile).group(1)
         selected_files2.configure(text='{}'.format(ppts))
+    print("ppt_dir는", ppt_dir)
+    print("ppts는", ppts)
         
     
     for ptfile in ptfiles:
@@ -112,7 +116,7 @@ btn_merge.grid(row=3, column=2, sticky="ew", padx=5, pady=5 )
 
 # 2번째 row
 sep1 = ttk.Separator(frame1, bootstyle = "danger")
-sec_label = Label(frame1, text = "PDF 파일을 선택해주세요.")
+sec_label = Label(frame1, text = "PPT 파일을 선택해주세요.")
 btn_search2 = ttk.Button(frame1, text="PPT 파일 불러오기", bootstyle="info", command=ppts_select_btn)
 selected_files2 = ttk.Label(frame1, text="", bootstyle="inverse-dark")
 btn_change = ttk.Button(frame1, text="PDF 변환하기", bootstyle="secondary", command=ppt_to_pdf)
@@ -120,10 +124,10 @@ btn_change = ttk.Button(frame1, text="PDF 변환하기", bootstyle="secondary", 
 
 # 2번째 row 배열
 sep1.grid(row=4, column=0, sticky="ew",pady=5)
-sec_label.grid(row=6, column=0, sticky="nsew",padx=5, pady=5)
-btn_search2.grid(row=6, column=0, sticky="ew", padx=5, pady=5)
-selected_files2.grid(row=6, column=1, sticky="ns",padx=5, pady=5)
-btn_change.grid(row=6, column=2, sticky="ew", padx=5, pady=5 )
+sec_label.grid(row=5, column=0, sticky="nsew",padx=5, pady=5)
+btn_search2.grid(row=7, column=0, sticky="ew", padx=5, pady=5)
+selected_files2.grid(row=7, column=1, sticky="ns",padx=5, pady=5)
+btn_change.grid(row=7, column=2, sticky="ew", padx=5, pady=5 )
 
 
 root.mainloop()
