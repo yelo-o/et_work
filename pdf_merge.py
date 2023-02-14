@@ -1,7 +1,7 @@
 # 모듈 import
 import re
 # pdf 부분
-from PyPDF2 import PdfMerger
+# from PyPDF2 import PdfMerger
 # gui 부분
 import tkinter as tk
 import ttkbootstrap as ttk
