@@ -13,7 +13,8 @@ from tkinter import *
 from tkinter import filedialog
 
 
-pop_path = 'C:/flyordig/et_work/poppler-23.01.0/Library/bin'
+# pop_path = 'C:/flyordig/et_work/poppler-23.01.0/Library/bin'
+pop_path = resource_path
 
 def file_select_btn():
     global pdf_path, pdf
