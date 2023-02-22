@@ -1,5 +1,14 @@
 from openpyxl import load_workbook
 
+
+# 시트명 변수로 저장
+sheet01 = '업무연락전'
+sheet02 = '거래명세표'
+sheet03 = '구매내역'
+sheet04 = '운송비'
+
+
+
 # 엑셀 파일
 wb = load_workbook(filename='22년 4분기 12월 매입매출정산서(비삼성)_샘플.xlsx')
 # print(wb.sheetnames)  # 파일의 시트를 불러옴
@@ -28,3 +37,4 @@ print('list1은',list1, len(list1))
 com_list = list1
 del com_list[0:2]
 print('최종', com_list, len(com_list))
+print("클라이언트 목록 불러오기 완료")
