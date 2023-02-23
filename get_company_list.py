@@ -31,7 +31,7 @@ for cell in ws['A']:
 for value in list0:
     if value not in list1:
         list1.append(value)
-print('list1은',list1, len(list1))
+# print('list1은',list1, len(list1))
 
 # list1에서 None과 '#공통' 제거하여 com_list 만들기
 com_list = list1
