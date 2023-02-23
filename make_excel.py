@@ -1,12 +1,14 @@
 import pandas as pd
+import re
 
 #회사 목록 불러오기
 # from get_company_list import com_list  # 진짜 코드(테스트할 때는 닫아놓기)
-com_list = ['KT&G', 'LX인터내셔널']  # 가짜 변수(코드)
+com_list = ['KT&G', 'SK에너지']  # 가짜 변수(코드)
 
 
 from openpyxl import load_workbook
 from openpyxl.utils import column_index_from_string
+from openpyxl.utils.cell import coordinate_from_string
 from openpyxl.drawing.image import Image
 
 img = Image('stamp.png')
@@ -18,10 +20,10 @@ for com in com_list:
     df = pd.read_excel('C:/flyordig/et_work/22년 4분기 12월 매입매출정산서(비삼성)_샘플.xlsx', sheet_name=2, engine='openpyxl')
     # print(wb.sheetnames)  # 파일의 시트를 불러옴
 
+    '''
     # <1번 워크시트>
     print("1번시트")
     ws = wb['업무연락전']
-    
     
     
     # 삭제할 회사 명단 저장
@@ -199,11 +201,23 @@ for com in com_list:
     
     # 인감 이미지 삽입
     ws.add_image(img, "F37")
-    
     '''
+    
+    
     # <2번 워크시트>
     print("2번시트")
-    ws = wb['거래명세표']
+    ws = wb['거래명세표']  # 2번 시트 열기
+    
+    # 병합 임시 해제
+    ws.unmerge_cells("I3:I25") # 공급자(I3:I25)
+    for i in range(5,25,1):
+        ws.unmerge_cells(f"L{i}:N{i}") # 회사주소
+    for j in range(3,26,1):
+        ws.unmerge_cells(f"J{j}:K{j}") # 업태
+    
+    
+    
+    # 행삭제 
     list_to_delete = []  # 삭제해야할 행의 인덱스를 저장할 리스트 [0, 1, 2, ...]
     for row in ws.iter_rows(min_row=2, min_col=1):
         if row[0].value != com:
@@ -215,25 +229,245 @@ for com in com_list:
         
     list_to_delete.reverse()  # 하나씩 append했기 때문에 순서가 뒤바뀜
     
-    print(f"2번 시트에서 업체가 {com}일 때 지워야할 줄 번호 목록은, {list_to_delete}는")
-    print('행 갯수는' ,len(list_to_delete))
     
-    # 삭제할 명단에 대해서 행 삭제 진행
+    # 행 삭제 실행
     for row_index in list_to_delete:
         ws.delete_rows(row_index)  # 한 줄씩 삭제
         
+    # 재병합
+    ws.merge_cells("I3:I6")  # 공급자
+    ws.merge_cells("L5:N5")  # 사업장 주소
+    ws.merge_cells("D7:H7")  # 아래와 같이 계산합니다.
+    ws.merge_cells("J3:K3")  # 등록번호
+    ws.merge_cells("J4:K4")  # 상호
+    ws.merge_cells("J5:K5")  # 사업장주소
+    ws.merge_cells("J6:K6")  # 업태
+    
+    ## 엑셀 함수 재설정
+    
+    # C열
+    last_row = ws.max_row
+    while ws.cell(last_row, 1).value is None:
+        last_row -= 1
+    print("last_row : ", last_row)
+        
+    for row in range(9, last_row +1):
+        
+        formula = ws.cell(row, 3).value
+        print("formula : ",formula)
+        if formula is not None:
+            pattern = r'(\$[A-Z]+\d+)'  # $A233    <- 이런식으로 받아오도록 정규식 표현
+            print("pattern : ",pattern)
+            match = re.search(pattern, formula)
+            formula_loc = match.group(1)
+            print("formula_loc : ", formula_loc)
+            left_cell = ws.cell(row, 2).coordinate
+            print("left_cell : ",left_cell)
+            formula_changed = formula.replace(formula_loc, left_cell)
+            print("formula_changed : ",formula_changed)
+            ws[f'C{row}'] = formula_changed
+    print("C열 마지막 행까지 함수 삽입 완료")    
+    
+    # D열
+    for row in range(9, last_row +1):
+        
+        formula = ws.cell(row, 4).value
+        print("formula : ",formula)
+        if formula is not None:
+            pattern = r'(\$[A-Z]+\d+)'  # $A233    <- 이런식으로 받아오도록 정규식 표현
+            print("pattern : ",pattern)
+            match = re.search(pattern, formula)
+            formula_loc = match.group(1)
+            print("formula_loc : ", formula_loc)
+            left_cell = ws.cell(row, 2).coordinate
+            print("left_cell : ",left_cell)
+            formula_changed = formula.replace(formula_loc, left_cell)
+            print("formula_changed : ",formula_changed)
+            ws[f'D{row}'] = formula_changed
+    print("D열 마지막 행까지 함수 삽입 완료")  
+    
+    # E열
+    for row in range(9, last_row +1):
+        
+        formula = ws.cell(row, 5).value
+        print("formula : ",formula)
+        if formula is not None:
+            pattern = r'(\$[A-Z]+\d+)'  # $A233    <- 이런식으로 받아오도록 정규식 표현
+            print("pattern : ",pattern)
+            match = re.search(pattern, formula)
+            formula_loc = match.group(1)
+            print("formula_loc : ", formula_loc)
+            left_cell = ws.cell(row, 2).coordinate
+            print("left_cell : ",left_cell)
+            formula_changed = formula.replace(formula_loc, left_cell)
+            print("formula_changed : ",formula_changed)
+            ws[f'E{row}'] = formula_changed
+    print("E열 마지막 행까지 함수 삽입 완료")  
+    
+    # F열
+    for row in range(9, last_row +1):
+        
+        formula = ws.cell(row, 6).value
+        print("formula : ",formula)
+        if formula is not None:
+            pattern = r'(\$[A-Z]+\d+)'  # $A233    <- 이런식으로 받아오도록 정규식 표현
+            print("pattern : ",pattern)
+            match = re.search(pattern, formula)
+            formula_loc = match.group(1)
+            print("formula_loc : ", formula_loc)
+            left_cell = ws.cell(row, 2).coordinate
+            print("left_cell : ",left_cell)
+            formula_changed = formula.replace(formula_loc, left_cell)
+            print("formula_changed : ",formula_changed)
+            ws[f'F{row}'] = formula_changed
+    print("F열 마지막 행까지 함수 삽입 완료")  
+    
+    # G열
+    for row in range(9, last_row):
+        
+        formula = ws.cell(row, 7).value
+        print("formula : ",formula)
+        if formula is not None:
+            pattern = r'(\$[A-Z]+\d+)'  # $A233    <- 이런식으로 받아오도록 정규식 표현
+            print("pattern : ",pattern)
+            match = re.search(pattern, formula)
+            formula_loc = match.group(1)
+            print("formula_loc : ", formula_loc)
+            left_cell = ws.cell(row, 2).coordinate
+            print("left_cell : ",left_cell)
+            formula_changed = formula.replace(formula_loc, left_cell)
+            print("formula_changed : ",formula_changed)
+            ws[f'G{row}'] = formula_changed
+    
+    
+    formula = ws.cell(last_row, 7).value
+    print("formula : ",formula)
+    pattern = r'([A-Z]+\d+:[A-Z]+\d+)'
+    match = re.search(pattern, formula)
+    formula_loc = match.group(1)
+    upper_cell1 = ws.cell(9, 7).coordinate
+    print("upper_cell1 : ", upper_cell1)
+    upper_cell2 = ws.cell(last_row-1, 7).coordinate
+    print("upper_cell2 : ", upper_cell2)
+    upper_cell = f"{upper_cell1}:{upper_cell2}"
+    print("upper_cell : ", upper_cell)
+    formula_changed = formula.replace(formula_loc, upper_cell)
+    print("formula_changed : ",formula_changed)
+    ws[f'G{last_row}'] = formula_changed
+    
+    print("G열 Sub-total까지 함수 삽입 완료")
+    # H열
+    for row in range(9, last_row):
+        
+        formula = ws.cell(row, 8).value
+        print("formula : ",formula)
+        if formula is not None:
+            pattern = r'(\$[A-Z]+\d+)'  # $A233    <- 이런식으로 받아오도록 정규식 표현
+            print("pattern : ",pattern)
+            match = re.search(pattern, formula)
+            formula_loc = match.group(1)
+            print("formula_loc : ", formula_loc)
+            left_cell = ws.cell(row, 2).coordinate
+            print("left_cell : ",left_cell)
+            formula_changed = formula.replace(formula_loc, left_cell)
+            print("formula_changed : ",formula_changed)
+            ws[f'H{row}'] = formula_changed
+    
+    formula = ws.cell(last_row, 8).value
+    print("formula : ",formula)
+    pattern = r'([A-Z]+\d+:[A-Z]+\d+)'
+    match = re.search(pattern, formula)
+    formula_loc = match.group(1)
+    upper_cell1 = ws.cell(9, 8).coordinate
+    print("upper_cell1 : ", upper_cell1)
+    upper_cell2 = ws.cell(last_row-1, 8).coordinate
+    print("upper_cell2 : ", upper_cell2)
+    upper_cell = f"{upper_cell1}:{upper_cell2}"
+    print("upper_cell : ", upper_cell)
+    formula_changed = formula.replace(formula_loc, upper_cell)
+    print("formula_changed : ",formula_changed)
+    ws[f'H{last_row}'] = formula_changed
+    print("H열 Sub-total까지 함수 삽입 완료")
+    
+    # I열
+    for row in range(9, last_row):
+        
+        formula = ws.cell(row, 9).value
+        print("formula : ",formula)
+        if formula is not None:
+            pattern = r'(\$[A-Z]+\d+)'  # $A233    <- 이런식으로 받아오도록 정규식 표현
+            print("pattern : ",pattern)
+            match = re.search(pattern, formula)
+            formula_loc = match.group(1)
+            print("formula_loc : ", formula_loc)
+            left_cell = ws.cell(row, 2).coordinate
+            print("left_cell : ",left_cell)
+            formula_changed = formula.replace(formula_loc, left_cell)
+            print("formula_changed : ",formula_changed)
+            ws[f'I{row}'] = formula_changed
+            
+            
+    formula = ws.cell(last_row, 9).value
+    print("formula : ",formula)
+    pattern = r'([A-Z]+\d+:[A-Z]+\d+)'
+    match = re.search(pattern, formula)
+    formula_loc = match.group(1)
+    upper_cell1 = ws.cell(9, 9).coordinate
+    print("upper_cell1 : ", upper_cell1)
+    upper_cell2 = ws.cell(last_row-1, 9).coordinate
+    print("upper_cell2 : ", upper_cell2)
+    upper_cell = f"{upper_cell1}:{upper_cell2}"
+    print("upper_cell : ", upper_cell)
+    formula_changed = formula.replace(formula_loc, upper_cell)
+    print("formula_changed : ",formula_changed)
+    ws[f'I{last_row}'] = formula_changed
+    print("I열 Sub-total까지 함수 삽입 완료")
+    
+    # J열
+    for row in range(9, last_row):
+        
+        formula = ws.cell(row, 10).value
+        print("formula : ",formula)
+        if formula is not None:
+            pattern = r'(\$[A-Z]+\d+)'  # $A233    <- 이런식으로 받아오도록 정규식 표현
+            print("pattern : ",pattern)
+            match = re.search(pattern, formula)
+            formula_loc = match.group(1)
+            print("formula_loc : ", formula_loc)
+            left_cell = ws.cell(row, 2).coordinate
+            print("left_cell : ",left_cell)
+            formula_changed = formula.replace(formula_loc, left_cell)
+            print("formula_changed : ",formula_changed)
+            ws[f'J{row}'] = formula_changed
+    formula = ws.cell(last_row, 10).value
+    print("formula : ",formula)
+    pattern = r'([A-Z]+\d+:[A-Z]+\d+)'
+    match = re.search(pattern, formula)
+    formula_loc = match.group(1)
+    upper_cell1 = ws.cell(9, 10).coordinate
+    print("upper_cell1 : ", upper_cell1)
+    upper_cell2 = ws.cell(last_row-1, 10).coordinate
+    print("upper_cell2 : ", upper_cell2)
+    upper_cell = f"{upper_cell1}:{upper_cell2}"
+    print("upper_cell : ", upper_cell)
+    formula_changed = formula.replace(formula_loc, upper_cell)
+    print("formula_changed : ",formula_changed)
+    ws[f'J{last_row}'] = formula_changed
+    print("J열 Sub-total까지 함수 삽입 완료")
+    
+    
     # 새로운 3번 시트 제작을 위해 기존 3번 시트 삭제
-    wb.remove(wb['구매내역'])
+    # wb.remove(wb['구매내역'])
     
     # 새로운 4번 시트 제작을 위해 기존 4번 시트 삭제
-    wb.remove(wb['운송비'])
+    # wb.remove(wb['운송비'])
     
     
+    '''
     
     # 변경된 내용 저장
     wb.save(f'{com}.xlsx')  # 파일 이름으로 저장
     print(f"{com} 파일 1차 저장")  
-    
     
     # <3번 워크시트>
     print("3번시트")
