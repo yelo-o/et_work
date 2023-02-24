@@ -439,6 +439,7 @@ for com in com_list:
             formula_changed = formula.replace(formula_loc, left_cell)
             print("formula_changed : ",formula_changed)
             ws[f'J{row}'] = formula_changed
+            
     formula = ws.cell(last_row, 10).value
     print("formula : ",formula)
     pattern = r'([A-Z]+\d+:[A-Z]+\d+)'
@@ -455,7 +456,40 @@ for com in com_list:
     ws[f'J{last_row}'] = formula_changed
     print("J열 Sub-total까지 함수 삽입 완료")
     
-    
+    # K열
+    for row in range(9, last_row):
+        
+        formula = ws.cell(row, 11).value
+        print("formula : ",formula)
+        if formula is not None:
+            pattern = r'(\$[A-Z]+\d+)'  # $A233    <- 이런식으로 받아오도록 정규식 표현
+            print("pattern : ",pattern)
+            match = re.search(pattern, formula)
+            formula_loc = match.group(1)
+            print("formula_loc : ", formula_loc)
+            left_cell = ws.cell(row, 2).coordinate
+            print("left_cell : ",left_cell)
+            formula_changed = formula.replace(formula_loc, left_cell)
+            print("formula_changed : ",formula_changed)
+            ws[f'K{row}'] = formula_changed
+            
+    formula = ws.cell(last_row, 11).value
+    print("formula : ",formula)
+    pattern = r'([A-Z]+\d+:[A-Z]+\d+)'
+    match = re.search(pattern, formula)
+    formula_loc = match.group(1)
+    upper_cell1 = ws.cell(9, 11).coordinate
+    print("upper_cell1 : ", upper_cell1)
+    upper_cell2 = ws.cell(last_row-1, 11).coordinate
+    print("upper_cell2 : ", upper_cell2)
+    upper_cell = f"{upper_cell1}:{upper_cell2}"
+    print("upper_cell : ", upper_cell)
+    formula_changed = formula.replace(formula_loc, upper_cell)
+    print("formula_changed : ",formula_changed)
+    ws[f'K{last_row}'] = formula_changed
+    print("K열 Sub-total까지 함수 삽입 완료")       
+            
+            
     # 새로운 3번 시트 제작을 위해 기존 3번 시트 삭제
     # wb.remove(wb['구매내역'])
     
