@@ -489,6 +489,9 @@ for com in com_list:
     ws[f'K{last_row}'] = formula_changed
     print("K열 Sub-total까지 함수 삽입 완료")       
             
+    # M열
+    
+    
             
     # 새로운 3번 시트 제작을 위해 기존 3번 시트 삭제
     # wb.remove(wb['구매내역'])
