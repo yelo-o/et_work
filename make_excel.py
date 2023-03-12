@@ -490,6 +490,40 @@ for com in com_list:
     print("K열 Sub-total까지 함수 삽입 완료")       
             
     # M열
+
+    for row in range(9, last_row):
+        
+        formula = ws.cell(row, 13).value  # M열은 13번째 열
+        print("formula : ",formula)
+        if formula is not None:
+            pattern = r'[A-Z]\d+'  # $A233    <- 이런식으로 받아오도록 정규식 표현
+            print("pattern : ",pattern)
+            matches = re.findall(pattern, formula)
+            print("matches : ", matches)
+            left_cells = [ws.cell(row, 7).coordinate, ws.cell(row, 10).coordinate,
+                          ws.cell(row, 11).coordinate, ws.cell(row, 12).coordinate,
+                          ws.cell(row, 15).coordinate]
+            print("left_cells : ",left_cells)
+            for i in range(len(matches)):
+                formula = formula.replace(matches[i], left_cells[i])
+            print("참조값 변경 : ",formula)
+            ws[f'M{row}'] = formula
+            
+    formula = ws.cell(last_row, 13).value
+    print("formula : ",formula)
+    pattern = r'([A-Z]+\d+:[A-Z]+\d+)'
+    match = re.search(pattern, formula)
+    formula_loc = match.group(1)
+    upper_cell1 = ws.cell(9, 13).coordinate
+    print("upper_cell1 : ", upper_cell1)
+    upper_cell2 = ws.cell(last_row-1, 13).coordinate
+    print("upper_cell2 : ", upper_cell2)
+    upper_cell = f"{upper_cell1}:{upper_cell2}"
+    print("upper_cell : ", upper_cell)
+    formula_changed = formula.replace(formula_loc, upper_cell)
+    print("formula_changed : ",formula_changed)
+    ws[f'M{last_row}'] = formula_changed
+    print("M열 Sub-total까지 함수 삽입 완료")      
     
     
             
