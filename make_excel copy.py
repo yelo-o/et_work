@@ -320,7 +320,7 @@ for com in com_list:
             formula_changed = formula.replace(formula_loc, left_cell)
             print("formula_changed : ",formula_changed)
             ws[f'F{row}'] = formula_changed
-    print("F열 마지막 행까지 함수 삽입 완료")  
+    print("F열 마지막 행까지 함수 삽입 완료")
     
     # G열
     for row in range(9, last_row):

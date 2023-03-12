@@ -11,6 +11,6 @@ excel_book.save('KT&G_refined.xlsx')
 excel_book.close()
 excel_app.quit()
 
-wb = load_workbook(filename='KT&G.xlsx', data_only=True)
+wb = load_workbook(filename='KT&G_refined.xlsx', data_only=True)
 
 wb.save('KT&G_refined2.xlsx')
