@@ -160,33 +160,44 @@ for com in com_list:
     ws.merge_cells("B38:G38") # 범위 재설정하여 재병합
     print("병합 완료")
     
-    # 행 높이 조절
+    ## 행 높이 조절
     ws.row_dimensions[11].height = 5.25
     ws.row_dimensions[16].height = 11.25
-    ws.row_dimensions[19].height = 23
-    ws.row_dimensions[20].height = 23
-    ws.row_dimensions[21].height = 23
-    ws.row_dimensions[22].height = 23
-    ws.row_dimensions[23].height = 23
-    ws.row_dimensions[24].height = 23
-    ws.row_dimensions[25].height = 23
     
-    ws.row_dimensions[26].height = 30
+    # 표에서 TOTAL 제외한 행 높이
+    height_number_list = [19,20,21,22,23,24,25]
+    for i in height_number_list:
+        ws.row_dimensions[i].height = 23
+        # ws.row_dimensions[19].height = 23
+        # ws.row_dimensions[20].height = 23
+        # ws.row_dimensions[21].height = 23
+        # ws.row_dimensions[22].height = 23
+        # ws.row_dimensions[23].height = 23
+        # ws.row_dimensions[24].height = 23
+        # ws.row_dimensions[25].height = 23
     
+    ws.row_dimensions[26].height = 30  # 표에서 TOTAL 부분
+    
+    # 기타 낮은 높이
     ws.row_dimensions[27].height = 6.75
     ws.row_dimensions[28].height = 6
     ws.row_dimensions[28].height = 9.75
     
-    ws.row_dimensions[30].height = 16.5
-    ws.row_dimensions[32].height = 16.5
-    ws.row_dimensions[33].height = 16.5
-    ws.row_dimensions[34].height = 16.5
-    ws.row_dimensions[35].height = 16.5
-    ws.row_dimensions[36].height = 16.5
-    ws.row_dimensions[37].height = 16.5
-    ws.row_dimensions[38].height = 16.5
-    ws.row_dimensions[39].height = 16.5
-    ws.row_dimensions[40].height = 1
+    # 3. 대금지불~맨아래 행까지의 높이
+    height_number_list = [30,32,33,34,35,36,37,38,39,40]  
+    for i in height_number_list:
+        ws.row_dimensions[i].height = 16.5
+        # ws.row_dimensions[30].height = 16.5
+        # ws.row_dimensions[32].height = 16.5
+        # ws.row_dimensions[33].height = 16.5
+        # ws.row_dimensions[34].height = 16.5
+        # ws.row_dimensions[35].height = 16.5
+        # ws.row_dimensions[36].height = 16.5
+        # ws.row_dimensions[37].height = 16.5
+        # ws.row_dimensions[38].height = 16.5
+        # ws.row_dimensions[39].height = 16.5
+        
+    # ws.row_dimensions[40].height = 1
     
     print("행 높이 조절 완료")
     
@@ -237,7 +248,7 @@ for com in com_list:
     # 재병합
     ws.merge_cells("I3:I6")  # 공급자
     ws.merge_cells("L5:N5")  # 사업장 주소
-    ws.merge_cells("D7:H7")  # 아래와 같이 계산합니다.
+    ws.merge_cells("D6:H6")  # 아래와 같이 계산합니다.
     ws.merge_cells("J3:K3")  # 등록번호
     ws.merge_cells("J4:K4")  # 상호
     ws.merge_cells("J5:K5")  # 사업장주소
@@ -245,12 +256,12 @@ for com in com_list:
     
     ## 엑셀 함수 재설정
     
-    # C열
     last_row = ws.max_row
     while ws.cell(last_row, 1).value is None:
         last_row -= 1
     print("last_row : ", last_row)
         
+    # C열
     for row in range(9, last_row +1):
         
         formula = ws.cell(row, 3).value
@@ -320,7 +331,7 @@ for com in com_list:
             formula_changed = formula.replace(formula_loc, left_cell)
             print("formula_changed : ",formula_changed)
             ws[f'F{row}'] = formula_changed
-    print("F열 마지막 행까지 함수 삽입 완료")
+    print("F열 마지막 행까지 함수 삽입 완료")  
     
     # G열
     for row in range(9, last_row):
@@ -487,12 +498,113 @@ for com in com_list:
     formula_changed = formula.replace(formula_loc, upper_cell)
     print("formula_changed : ",formula_changed)
     ws[f'K{last_row}'] = formula_changed
-    print("K열 Sub-total까지 함수 삽입 완료")       
+    print("K열 Sub-total까지 함수 삽입 완료")
             
     # M열
-    
-    
+
+    for row in range(9, last_row):
+        
+        formula = ws.cell(row, 13).value  # M열은 13번째 열
+        print("formula : ",formula)
+        if formula is not None:
+            pattern = r'[A-Z]\d+'  # $A233    <- 이런식으로 받아오도록 정규식 표현
+            print("pattern : ",pattern)
+            matches = re.findall(pattern, formula)
+            print("matches : ", matches)
+            left_cells = [ws.cell(row, 7).coordinate, ws.cell(row, 10).coordinate,
+                          ws.cell(row, 11).coordinate, ws.cell(row, 12).coordinate,
+                          ws.cell(row, 15).coordinate]
+            print("left_cells : ",left_cells)
+            for i in range(len(matches)):
+                formula = formula.replace(matches[i], left_cells[i])
+            print("참조값 변경 : ",formula)
+            ws[f'M{row}'] = formula
             
+    formula = ws.cell(last_row, 13).value
+    print("formula : ",formula)
+    pattern = r'([A-Z]+\d+:[A-Z]+\d+)'
+    match = re.search(pattern, formula)
+    formula_loc = match.group(1)
+    upper_cell1 = ws.cell(9, 13).coordinate
+    print("upper_cell1 : ", upper_cell1)
+    upper_cell2 = ws.cell(last_row-1, 13).coordinate
+    print("upper_cell2 : ", upper_cell2)
+    upper_cell = f"{upper_cell1}:{upper_cell2}"
+    print("upper_cell : ", upper_cell)
+    formula_changed = formula.replace(formula_loc, upper_cell)
+    print("formula_changed : ",formula_changed)
+    ws[f'M{last_row}'] = formula_changed
+    print("M열 Sub-total까지 함수 삽입 완료")      
+    
+    # N열 (G+J+K+M+L)
+
+    for row in range(9, last_row):
+        
+        formula = ws.cell(row, 14).value  # M열은 13번째 열
+        print("formula : ",formula)
+        if formula is not None:
+            pattern = r'[A-Z]\d+'  # 대문자 A131
+            print("pattern : ",pattern)
+            matches = re.findall(pattern, formula)
+            print("matches : ", matches)
+            left_cells = [ws.cell(row, 7).coordinate, ws.cell(row, 10).coordinate,
+                          ws.cell(row, 11).coordinate, ws.cell(row, 12).coordinate,
+                          ws.cell(row, 13).coordinate]
+            print("left_cells : ",left_cells)
+            for i in range(len(matches)):
+                formula = formula.replace(matches[i], left_cells[i])
+            print("참조값 변경 : ",formula)
+            ws[f'N{row}'] = formula
+            
+    formula = ws.cell(last_row, 14).value
+    print("formula : ",formula)
+    pattern = r'([A-Z]+\d+:[A-Z]+\d+)'
+    match = re.search(pattern, formula)
+    formula_loc = match.group(1)
+    upper_cell1 = ws.cell(9, 14).coordinate
+    print("upper_cell1 : ", upper_cell1)
+    upper_cell2 = ws.cell(last_row-1, 14).coordinate
+    print("upper_cell2 : ", upper_cell2)
+    upper_cell = f"{upper_cell1}:{upper_cell2}"
+    print("upper_cell : ", upper_cell)
+    formula_changed = formula.replace(formula_loc, upper_cell)
+    print("formula_changed : ",formula_changed)
+    ws[f'N{last_row}'] = formula_changed
+    print("N열 Sub-total까지 함수 삽입 완료")
+    
+    # O열 (수수요율)
+
+    for row in range(9, last_row):
+        
+        formula = ws.cell(row, 15).value  # M열은 13번째 열
+        print("formula : ",formula)
+        if formula is not None:
+            pattern = r'C\d+'  # ex) C153 
+            print("pattern : ",pattern) 
+            matches = re.findall(pattern, formula)
+            left_cell = ws.cell(row, 2).coordinate
+            print("left_cell : ",left_cell)
+            formula_changed = formula.replace(matches[0], left_cell)
+            print("formula_changed : ",formula_changed)
+            ws[f'O{row}'] = formula_changed
+            
+    
+    # D열 (합계금액)
+    formula = ws.cell(7, 4).value  # D열 4번째 열
+    print("formula : ",formula)
+    if formula is not None:
+        pattern = r'N\d+'  # ex) N153
+        print("pattern : ", pattern)
+        matches = re.findall(pattern, formula)
+        print("matches : ", matches)
+        target_cell = 'N13'
+        print("target_cell : ", target_cell)
+        formula_changed = formula.replace(matches[0], target_cell)
+        print("formula_changed : ",formula_changed)
+        ws['D7'] = formula_changed
+    
+    # A열과 O열 삭제 프로세스 추가
+    
     # 새로운 3번 시트 제작을 위해 기존 3번 시트 삭제
     # wb.remove(wb['구매내역'])
     
@@ -538,6 +650,9 @@ for com in com_list:
     
     wb.save(f'{com}.xlsx')  # 파일 이름으로 저장
     print(f"{com} 파일 저장 및 완료") 
+    
+    
+    
     
     
 
